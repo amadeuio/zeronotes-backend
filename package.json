@@ -8,6 +8,7 @@
     "dev": "nodemon server.js",
     "migrate": "node utils/runMigrations.js",
     "seed": "node utils/runSeeds.js",
+    "schema:dump": "node utils/dumpSchema.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
