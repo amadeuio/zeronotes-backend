@@ -1,1 +1,18 @@
-# Keep Backend
+# Zeronotes Backend
+
+Backend API for Zeronotes - a notes app with secure data persistence.
+
+> **Work in progress.**
+
+## Features
+
+- RESTful API for notes and labels
+- PostgreSQL database with migrations
+- CRUD operations for notes and labels
+- Many-to-many relationship between notes and labels
+
+## Tech Stack
+
+- Node.js + Express
+- PostgreSQL
+- pg (PostgreSQL client)
