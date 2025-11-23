@@ -43,14 +43,9 @@ const Note = {
       SELECT 
         n.*,
         COALESCE(
-          json_agg(
-            json_build_object(
-              'id', l.id,
-              'name', l.name
-            )
-          ) FILTER (WHERE l.id IS NOT NULL),
+          json_agg(l.id) FILTER (WHERE l.id IS NOT NULL),
           '[]'::json
-        ) as labels
+        ) as label_ids
       FROM notes n
       LEFT JOIN note_labels nl ON n.id = nl.note_id
       LEFT JOIN labels l ON nl.label_id = l.id
