@@ -2,7 +2,22 @@ const Note = require('../models/Note');
 
 const getAllNotes = async (req, res, next) => {
   try {
-    const notes = await Note.findAll();
+    const { search, view, labelId } = req.query;
+    
+    let parsedView = null;
+    if (view) {
+      parsedView = { type: view };
+      if (view === 'label' && labelId) {
+        parsedView.id = labelId;
+      }
+    }
+
+    const filters = {
+      search: search || '',
+      view: parsedView
+    };
+
+    const notes = await Note.findAll(filters);
     res.json(notes);
   } catch (error) {
     next(error);
