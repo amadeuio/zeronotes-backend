@@ -3,22 +3,7 @@ const Label = require('../models/Label');
 
 const getAllNotes = async (req, res, next) => {
   try {
-    const { search, view, label_id } = req.query;
-    
-    let parsedView = null;
-    if (view) {
-      parsedView = { type: view };
-      if (view === 'label' && label_id) {
-        parsedView.id = label_id;
-      }
-    }
-
-    const filters = {
-      search: search || '',
-      view: parsedView
-    };
-
-    const notes = await Note.findAll(filters);
+    const notes = await Note.findAll();
     res.json(notes);
   } catch (error) {
     next(error);

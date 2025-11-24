@@ -1,43 +1,8 @@
 const pool = require('../config/database');
 
 const Note = {
-  findAll: async (filters = {}) => {
-    const { view, search } = filters;
-    
-    const conditions = [];
-    const params = [];
-    let paramIndex = 1;
-
-    if (view) {
-      if (view.type === 'archive') {
-        conditions.push(`n.is_archived = true`);
-      } else if (view.type === 'trash') {
-        conditions.push(`n.is_trashed = true`);
-      } else if (view.type === 'notes') {
-        conditions.push(`n.is_archived = false AND n.is_trashed = false`);
-      } else if (view.type === 'label' && view.id) {
-        conditions.push(`n.id IN (
-          SELECT note_id FROM note_labels WHERE label_id = $${paramIndex}
-        )`);
-        params.push(view.id);
-        paramIndex++;
-      }
-    }
-
-    if (search && search.trim()) {
-      conditions.push(`(
-        n.title ILIKE $${paramIndex} OR 
-        n.content ILIKE $${paramIndex}
-      )`);
-      params.push(`%${search.trim()}%`);
-      paramIndex++;
-    }
-
-    const whereClause = conditions.length > 0 
-      ? `WHERE ${conditions.join(' AND ')}`
-      : '';
-
-    const query = `
+  findAll: async () => {
+    const result = await pool.query(`
       SELECT 
         n.*,
         COALESCE(
@@ -47,12 +12,10 @@ const Note = {
       FROM notes n
       LEFT JOIN note_labels nl ON n.id = nl.note_id
       LEFT JOIN labels l ON nl.label_id = l.id
-      ${whereClause}
       GROUP BY n.id
       ORDER BY n.created_at DESC
-    `;
-
-    const result = await pool.query(query, params);
+    `);
+    
     return result.rows;
   },
 
