@@ -56,10 +56,10 @@ const Note = {
     return result.rows;
   },
 
-  create: async (title, content, color_id = 'default', is_pinned = false, is_archived = false) => {
+  create: async (id, title, content, color_id = 'default', is_pinned = false, is_archived = false) => {
     const result = await pool.query(
-      'INSERT INTO notes (title, content, color_id, is_pinned, is_archived) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [title, content, color_id, is_pinned, is_archived]
+      'INSERT INTO notes (id, title, content, color_id, is_pinned, is_archived) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [id, title, content, color_id, is_pinned, is_archived]
     );
     return result.rows[0];
   },

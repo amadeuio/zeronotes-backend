@@ -27,9 +27,14 @@ const getAllNotes = async (req, res, next) => {
 
 const createNote = async (req, res, next) => {
   try {
-    const { title, content, color_id, is_pinned, is_archived, labels } = req.body;
+    const { id, title, content, color_id, is_pinned, is_archived, labels } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ error: 'Note id is required' });
+    }
 
     const note = await Note.create(
+      id,
       title || null,
       content || null,
       color_id,
