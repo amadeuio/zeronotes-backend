@@ -20,8 +20,8 @@ const createNote = async (req, res, next) => {
 
     const note = await Note.create(
       id,
-      title || null,
-      content || null,
+      title,
+      content,
       color_id,
       is_pinned,
       is_archived
