@@ -56,10 +56,10 @@ const Note = {
     return result.rows;
   },
 
-  create: async (title, content, colorId = 'default', isPinned = false, isArchived = false) => {
+  create: async (title, content, color_id = 'default', is_pinned = false, is_archived = false) => {
     const result = await pool.query(
       'INSERT INTO notes (title, content, color_id, is_pinned, is_archived) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [title, content, colorId, isPinned, isArchived]
+      [title, content, color_id, is_pinned, is_archived]
     );
     return result.rows[0];
   },
@@ -124,10 +124,10 @@ const Note = {
     return result.rows[0];
   },
 
-  addLabel: async (noteId, labelId) => {
+  addLabel: async (note_id, label_id) => {
     const existing = await pool.query(
       'SELECT * FROM note_labels WHERE note_id = $1 AND label_id = $2',
-      [noteId, labelId]
+      [note_id, label_id]
     );
 
     if (existing.rows.length > 0) {
@@ -136,15 +136,15 @@ const Note = {
 
     const result = await pool.query(
       'INSERT INTO note_labels (note_id, label_id) VALUES ($1, $2) RETURNING *',
-      [noteId, labelId]
+      [note_id, label_id]
     );
     return result.rows[0];
   },
 
-  removeLabel: async (noteId, labelId) => {
+  removeLabel: async (note_id, label_id) => {
     const result = await pool.query(
       'DELETE FROM note_labels WHERE note_id = $1 AND label_id = $2 RETURNING *',
-      [noteId, labelId]
+      [note_id, label_id]
     );
     return result.rows[0];
   },

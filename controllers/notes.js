@@ -3,13 +3,13 @@ const Label = require('../models/Label');
 
 const getAllNotes = async (req, res, next) => {
   try {
-    const { search, view, labelId } = req.query;
+    const { search, view, label_id } = req.query;
     
     let parsedView = null;
     if (view) {
       parsedView = { type: view };
-      if (view === 'label' && labelId) {
-        parsedView.id = labelId;
+      if (view === 'label' && label_id) {
+        parsedView.id = label_id;
       }
     }
 
@@ -27,14 +27,16 @@ const getAllNotes = async (req, res, next) => {
 
 const createNote = async (req, res, next) => {
   try {
-    const { title, content, colorId, isPinned, isArchived } = req.body;
+    const { title, content, color_id, is_pinned, is_archived } = req.body;
 
+    console.log(req.body)
+    
     const note = await Note.create(
       title || null,
       content || null,
-      colorId,
-      isPinned,
-      isArchived
+      color_id,
+      is_pinned,
+      is_archived
     );
     res.status(201).json(note);
   } catch (error) {
@@ -75,7 +77,7 @@ const deleteNote = async (req, res, next) => {
 
 const addLabelToNote = async (req, res, next) => {
   try {
-    const { id, labelId } = req.params;
+    const { id, label_id } = req.params;
 
     const note = await Note.findById(id);
     if (!note) {
@@ -83,12 +85,12 @@ const addLabelToNote = async (req, res, next) => {
     }
 
     const pool = require('../config/database');
-    const labelResult = await pool.query('SELECT * FROM labels WHERE id = $1', [labelId]);
+    const labelResult = await pool.query('SELECT * FROM labels WHERE id = $1', [label_id]);
     if (labelResult.rows.length === 0) {
       return res.status(404).json({ error: 'Label not found' });
     }
 
-    const association = await Note.addLabel(id, labelId);
+    const association = await Note.addLabel(id, label_id);
     res.status(201).json(association);
   } catch (error) {
     next(error);
@@ -97,14 +99,14 @@ const addLabelToNote = async (req, res, next) => {
 
 const removeLabelFromNote = async (req, res, next) => {
   try {
-    const { id, labelId } = req.params;
+    const { id, label_id } = req.params;
 
     const note = await Note.findById(id);
     if (!note) {
       return res.status(404).json({ error: 'Note not found' });
     }
 
-    const association = await Note.removeLabel(id, labelId);
+    const association = await Note.removeLabel(id, label_id);
     if (!association) {
       return res.status(404).json({ error: 'Label association not found' });
     }
