@@ -27,10 +27,8 @@ const getAllNotes = async (req, res, next) => {
 
 const createNote = async (req, res, next) => {
   try {
-    const { title, content, color_id, is_pinned, is_archived } = req.body;
+    const { title, content, color_id, is_pinned, is_archived, labels } = req.body;
 
-    console.log(req.body)
-    
     const note = await Note.create(
       title || null,
       content || null,
@@ -38,6 +36,14 @@ const createNote = async (req, res, next) => {
       is_pinned,
       is_archived
     );
+
+    if (labels && Array.isArray(labels) && labels.length > 0) {
+      const labelIds = labels.map(label => label.id).filter(Boolean);
+      if (labelIds.length > 0) {
+        await Note.addLabels(note.id, labelIds);
+      }
+    }
+
     res.status(201).json(note);
   } catch (error) {
     next(error);
@@ -90,8 +96,8 @@ const addLabelToNote = async (req, res, next) => {
       return res.status(404).json({ error: 'Label not found' });
     }
 
-    const association = await Note.addLabel(id, label_id);
-    res.status(201).json(association);
+    const associations = await Note.addLabels(id, [label_id]);
+    res.status(201).json(associations[0] || { note_id: id, label_id });
   } catch (error) {
     next(error);
   }
@@ -137,11 +143,11 @@ const createLabelAndAddToNote = async (req, res, next) => {
     }
 
     const label = await Label.create(labelData.id, labelData.name);
-    const association = await Note.addLabel(id, label.id);
+    const associations = await Note.addLabels(id, [label.id]);
 
     res.status(201).json({
       label,
-      association,
+      association: associations[0] || { note_id: id, label_id: label.id },
     });
   } catch (error) {
     next(error);

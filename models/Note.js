@@ -124,21 +124,30 @@ const Note = {
     return result.rows[0];
   },
 
-  addLabel: async (note_id, label_id) => {
-    const existing = await pool.query(
-      'SELECT * FROM note_labels WHERE note_id = $1 AND label_id = $2',
-      [note_id, label_id]
-    );
-
-    if (existing.rows.length > 0) {
-      return existing.rows[0];
+  addLabels: async (note_id, label_ids) => {
+    if (!label_ids || label_ids.length === 0) {
+      return [];
     }
 
-    const result = await pool.query(
-      'INSERT INTO note_labels (note_id, label_id) VALUES ($1, $2) RETURNING *',
-      [note_id, label_id]
-    );
-    return result.rows[0];
+    const values = [];
+    const params = [];
+    let paramIndex = 2;
+
+    for (const label_id of label_ids) {
+      values.push(`($1, $${paramIndex})`);
+      params.push(label_id);
+      paramIndex++;
+    }
+
+    const query = `
+      INSERT INTO note_labels (note_id, label_id)
+      VALUES ${values.join(', ')}
+      ON CONFLICT (note_id, label_id) DO NOTHING
+      RETURNING *
+    `;
+
+    const result = await pool.query(query, [note_id, ...params]);
+    return result.rows;
   },
 
   removeLabel: async (note_id, label_id) => {
