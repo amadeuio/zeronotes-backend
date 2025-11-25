@@ -1,11 +1,18 @@
 import pool from "../config/database";
-import { Note as NoteType, NoteUpdate } from "../types/notes";
+import { CreateNoteRequest, type Note, type NoteUpdate } from "../types/notes";
+import { keysToCamel, keysToSnake } from "../utils/caseConverter";
 
 const Note = {
-  findAll: async (): Promise<NoteType[]> => {
+  getAll: async (): Promise<(Note & { labelIds: string[] })[]> => {
     const result = await pool.query(`
       SELECT 
-        n.*,
+        n.id,
+        n.title,
+        n.content,
+        n.color_id,
+        n.is_pinned,
+        n.is_archived,
+        n.is_trashed,
         COALESCE(
           json_agg(l.id) FILTER (WHERE l.id IS NOT NULL),
           '[]'::json
@@ -13,29 +20,32 @@ const Note = {
       FROM notes n
       LEFT JOIN note_labels nl ON n.id = nl.note_id
       LEFT JOIN labels l ON nl.label_id = l.id
-      GROUP BY n.id
+      GROUP BY n.id, n.title, n.content, n.color_id, n.is_pinned, n.is_archived, n.is_trashed, n.created_at
       ORDER BY n.created_at DESC
     `);
 
-    return result.rows;
+    return result.rows.map(keysToCamel);
   },
 
   create: async (
-    id: string,
-    title: string | null,
-    content: string | null,
-    color_id: string = "default",
-    is_pinned: boolean = false,
-    is_archived: boolean = false
-  ): Promise<NoteType> => {
-    const result = await pool.query(
-      "INSERT INTO notes (id, title, content, color_id, is_pinned, is_archived) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-      [id, title, content, color_id, is_pinned, is_archived]
-    );
-    return result.rows[0];
+    body: Omit<CreateNoteRequest, "labelIds">
+  ): Promise<string> => {
+    const { id, title, content, color_id, is_pinned, is_archived } =
+      keysToSnake(body);
+
+    const query = `
+      INSERT INTO notes (id, title, content, color_id, is_pinned, is_archived) 
+      VALUES ($1, $2, $3, $4, $5, $6) 
+      RETURNING id, title, content, color_id, is_pinned, is_archived, is_trashed
+    `;
+
+    const values = [id, title, content, color_id, is_pinned, is_archived];
+
+    const result = await pool.query(query, values);
+    return result.rows[0].id;
   },
 
-  update: async (id: string, updates: NoteUpdate): Promise<NoteType> => {
+  update: async (id: string, updates: NoteUpdate): Promise<Note> => {
     const fields: string[] = [];
     const values: unknown[] = [];
     let paramCount = 1;
@@ -81,7 +91,7 @@ const Note = {
     return result.rows[0];
   },
 
-  deleteById: async (id: string): Promise<NoteType | undefined> => {
+  deleteById: async (id: string): Promise<Note | undefined> => {
     const result = await pool.query(
       "DELETE FROM notes WHERE id = $1 RETURNING *",
       [id]
@@ -89,7 +99,7 @@ const Note = {
     return result.rows[0];
   },
 
-  findById: async (id: string): Promise<NoteType | undefined> => {
+  findById: async (id: string): Promise<Note | undefined> => {
     const result = await pool.query("SELECT * FROM notes WHERE id = $1", [id]);
     return result.rows[0];
   },

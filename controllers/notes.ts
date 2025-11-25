@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import pool from "../config/database";
 import Label from "../models/Label";
 import Note from "../models/Note";
+import NoteLabel from "../models/NoteLabel";
 import { CreateNoteRequest } from "../types/notes";
 
 const getAllNotes = async (
@@ -10,7 +11,7 @@ const getAllNotes = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const notes = await Note.findAll();
+    const notes = await Note.getAll();
     res.json(notes);
   } catch (error) {
     next(error);
@@ -19,37 +20,29 @@ const getAllNotes = async (
 
 const createNote = async (
   req: Request<{}, {}, CreateNoteRequest>,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<void> => {
+  const { id, title, content, colorId, isPinned, isArchived, labelIds } =
+    req.body;
+
   try {
-    const { id, title, content, color_id, is_pinned, is_archived, labels } =
-      req.body;
-
-    if (!id) {
-      res.status(400).json({ error: "Note id is required" });
-      return;
-    }
-
-    const note = await Note.create(
+    const noteId = await Note.create({
       id,
-      title || null,
-      content || null,
-      color_id,
-      is_pinned,
-      is_archived
-    );
+      title,
+      content,
+      colorId,
+      isPinned,
+      isArchived,
+    });
 
-    if (labels && Array.isArray(labels) && labels.length > 0) {
-      const labelIds = labels.map((label) => label.id).filter(Boolean);
-      if (labelIds.length > 0) {
-        await Note.addLabels(note.id, labelIds);
-      }
+    if (Array.isArray(labelIds) && labelIds.length > 0) {
+      await NoteLabel.addLabelsToNote(noteId, labelIds);
     }
 
-    res.status(201).json(note);
+    res.status(201).send();
   } catch (error) {
-    next(error);
+    console.error(error);
+    res.status(500).json({ error: "Could not create note" });
   }
 };
 
