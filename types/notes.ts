@@ -1,5 +1,6 @@
 export interface Note {
   id: string;
+  order: number;
   title: string;
   content: string;
   colorId: string;
@@ -10,9 +11,9 @@ export interface Note {
   updatedAt: Date;
 }
 
-export interface NoteWithLabels extends Note {
+export type NoteDto = Note & {
   labelIds: string[];
-}
+};
 
 export interface NoteCreateRequest {
   id: string;

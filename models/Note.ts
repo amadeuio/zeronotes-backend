@@ -1,9 +1,9 @@
 import pool from "../config/database";
-import { Note, NoteWithLabels } from "../types/notes";
+import { Note, NoteDto } from "../types/notes";
 import { keysToCamel } from "../utils/caseConverter";
 
 const NoteModel = {
-  findAll: async (): Promise<NoteWithLabels[]> => {
+  findAll: async (): Promise<NoteDto[]> => {
     const result = await pool.query(`
       SELECT 
         n.*,
@@ -29,12 +29,23 @@ const NoteModel = {
     isPinned?: boolean,
     isArchived?: boolean
   ): Promise<Note> => {
+    const minPos = await pool.query('SELECT MIN("order") FROM notes');
+    const firstPos = minPos.rows[0].min - 1;
+
     const query = `
-      INSERT INTO notes (id, title, content, color_id, is_pinned, is_archived) 
-      VALUES ($1, $2, $3, $4, $5, $6) 
+      INSERT INTO notes (id, "order", title, content, color_id, is_pinned, is_archived) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7) 
       RETURNING *
     `;
-    const values = [id, title, content, colorId, isPinned, isArchived];
+    const values = [
+      id,
+      firstPos,
+      title,
+      content,
+      colorId,
+      isPinned,
+      isArchived,
+    ];
 
     const result = await pool.query(query, values);
     return keysToCamel(result.rows[0]);
