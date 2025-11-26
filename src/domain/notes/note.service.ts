@@ -67,4 +67,11 @@ export const noteService = {
   removeLabel: async (noteId: string, labelId: string): Promise<void> => {
     await noteLabelQueries.removeLabelFromNote(noteId, labelId);
   },
+
+  reorder: async (noteIds: string[]): Promise<void> => {
+    const updates: { id: string; order: number }[] = noteIds.map(
+      (id, index) => ({ id, order: index })
+    );
+    await noteQueries.updateOrders(updates);
+  },
 };

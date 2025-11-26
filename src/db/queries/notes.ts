@@ -97,4 +97,28 @@ export const noteQueries = {
     const result = await pool.query('SELECT MIN("order") FROM notes');
     return result.rows[0].min - 1;
   },
+
+  updateOrders: async (
+    updates: Array<{ id: string; order: number }>
+  ): Promise<void> => {
+    const values: any[] = [];
+    const valuePlaceholders: string[] = [];
+    let paramCount = 1;
+
+    for (const update of updates) {
+      valuePlaceholders.push(
+        `($${paramCount++}::uuid, $${paramCount++}::integer)`
+      );
+      values.push(update.id, update.order);
+    }
+
+    const query = `
+      UPDATE notes
+      SET "order" = v.order_value, updated_at = NOW()
+      FROM (VALUES ${valuePlaceholders.join(", ")}) AS v(id, order_value)
+      WHERE notes.id = v.id
+    `;
+
+    await pool.query(query, values);
+  },
 };

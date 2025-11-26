@@ -134,6 +134,25 @@ const createLabelAndAddToNote = async (
   }
 };
 
+const reorderNotes = async (
+  req: Request<{}, {}, { noteIds: string[] }>,
+  res: Response
+) => {
+  try {
+    const { noteIds } = req.body;
+
+    if (!Array.isArray(noteIds) || noteIds.length === 0) {
+      res.status(400).json({ error: "noteIds must be a non-empty array" });
+      return;
+    }
+
+    await noteService.reorder(noteIds);
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: "Failed to reorder notes" });
+  }
+};
+
 router.get("/", getAllNotes);
 router.post("/", createNote);
 router.put("/:id", updateNote);
@@ -141,5 +160,6 @@ router.delete("/:id", deleteNote);
 router.post("/:id/labels/:labelId", addLabelToNote);
 router.delete("/:id/labels/:labelId", removeLabelFromNote);
 router.post("/:id/labels", createLabelAndAddToNote);
+router.post("/reorder", reorderNotes);
 
 export default router;
