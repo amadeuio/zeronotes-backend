@@ -6,6 +6,8 @@ export interface Note {
   isPinned: boolean;
   isArchived: boolean;
   isTrashed: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type CreateNoteRequest = {

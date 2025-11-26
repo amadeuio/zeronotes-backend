@@ -10,13 +10,7 @@ const Note = {
   getAll: async (): Promise<(Note & { labelIds: string[] })[]> => {
     const result = await pool.query(`
       SELECT 
-        n.id,
-        n.title,
-        n.content,
-        n.color_id,
-        n.is_pinned,
-        n.is_archived,
-        n.is_trashed,
+        n.*,
         COALESCE(
           json_agg(l.id) FILTER (WHERE l.id IS NOT NULL),
           '[]'::json
@@ -24,7 +18,7 @@ const Note = {
       FROM notes n
       LEFT JOIN note_labels nl ON n.id = nl.note_id
       LEFT JOIN labels l ON nl.label_id = l.id
-      GROUP BY n.id, n.title, n.content, n.color_id, n.is_pinned, n.is_archived, n.is_trashed, n.created_at
+      GROUP BY n.id
       ORDER BY n.created_at DESC
     `);
 
@@ -38,7 +32,7 @@ const Note = {
     const query = `
       INSERT INTO notes (id, title, content, color_id, is_pinned, is_archived) 
       VALUES ($1, $2, $3, $4, $5, $6) 
-      RETURNING id, title, content, color_id, is_pinned, is_archived, is_trashed
+      RETURNING *
     `;
 
     const values = [id, title, content, color_id, is_pinned, is_archived];
@@ -48,46 +42,22 @@ const Note = {
   },
 
   update: async (id: string, updates: NoteUpdateRequest): Promise<Note> => {
-    const { title, content, color_id, is_pinned, is_archived, is_trashed } =
-      keysToSnake(updates);
-
+    const snakeUpdates = keysToSnake(updates);
     const fields = [];
     const values = [];
     let paramCount = 1;
 
-    if (title !== undefined) {
-      fields.push(`title = $${paramCount++}`);
-      values.push(title);
-    }
-    if (content !== undefined) {
-      fields.push(`content = $${paramCount++}`);
-      values.push(content);
-    }
-    if (color_id !== undefined) {
-      fields.push(`color_id = $${paramCount++}`);
-      values.push(color_id);
-    }
-    if (is_pinned !== undefined) {
-      fields.push(`is_pinned = $${paramCount++}`);
-      values.push(is_pinned);
-    }
-    if (is_archived !== undefined) {
-      fields.push(`is_archived = $${paramCount++}`);
-      values.push(is_archived);
-    }
-    if (is_trashed !== undefined) {
-      fields.push(`is_trashed = $${paramCount++}`);
-      values.push(is_trashed);
+    for (const [key, value] of Object.entries(snakeUpdates)) {
+      if (value !== undefined) {
+        fields.push(`${key} = $${paramCount++}`);
+        values.push(value);
+      }
     }
 
     fields.push(`updated_at = NOW()`);
     values.push(id);
 
-    const query = `
-      UPDATE notes SET ${fields.join(", ")} WHERE id = $${paramCount} 
-      RETURNING id, title, content, color_id, is_pinned, is_archived, is_trashed
-    `;
-
+    const query = `UPDATE notes SET ${fields.join(", ")} WHERE id = $${paramCount} RETURNING *`;
     const result = await pool.query(query, values);
     return keysToCamel(result.rows[0]);
   },
@@ -95,7 +65,7 @@ const Note = {
   deleteById: async (id: string): Promise<Note | undefined> => {
     const query = `
       DELETE FROM notes WHERE id = $1 
-      RETURNING id, title, content, color_id, is_pinned, is_archived, is_trashed
+      RETURNING *
     `;
 
     const result = await pool.query(query, [id]);
@@ -103,29 +73,23 @@ const Note = {
   },
 
   findById: async (id: string): Promise<Note | undefined> => {
-    const query = `
-      SELECT * FROM notes WHERE id = $1
-    `;
+    const query = `SELECT * FROM notes WHERE id = $1`;
 
     const result = await pool.query(query, [id]);
     return keysToCamel(result.rows[0]);
   },
 
   addLabels: async (
-    note_id: string,
-    label_ids: number[]
-  ): Promise<Array<{ note_id: string; label_id: number }>> => {
-    if (!label_ids || label_ids.length === 0) {
-      return [];
-    }
-
-    const values: string[] = [];
-    const params: number[] = [];
+    noteId: string,
+    labelIds: string[]
+  ): Promise<Array<{ noteId: string; labelId: string }>> => {
+    const values = [];
+    const params = [];
     let paramIndex = 2;
 
-    for (const label_id of label_ids) {
+    for (const labelId of labelIds) {
       values.push(`($1, $${paramIndex})`);
-      params.push(label_id);
+      params.push(labelId);
       paramIndex++;
     }
 
@@ -136,19 +100,19 @@ const Note = {
       RETURNING *
     `;
 
-    const result = await pool.query(query, [note_id, ...params]);
-    return result.rows;
+    const result = await pool.query(query, [noteId, ...params]);
+    return result.rows.map(keysToCamel);
   },
 
   removeLabel: async (
-    note_id: string,
-    label_id: number
-  ): Promise<{ note_id: string; label_id: number } | undefined> => {
+    noteId: string,
+    labelId: string
+  ): Promise<{ noteId: string; labelId: string } | undefined> => {
     const result = await pool.query(
       "DELETE FROM note_labels WHERE note_id = $1 AND label_id = $2 RETURNING *",
-      [note_id, label_id]
+      [noteId, labelId]
     );
-    return result.rows[0];
+    return result.rows[0] ? keysToCamel(result.rows[0]) : undefined;
   },
 };
 
