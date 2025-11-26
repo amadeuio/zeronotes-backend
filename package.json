@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "nodemon --exec ts-node server.ts",
-    "migrate": "ts-node utils/runMigrations.ts && ts-node utils/dumpSchema.ts",
+    "migrate": "ts-node utils/runMigrations.ts",
     "seed": "ts-node utils/runSeeds.ts",
     "format": "prettier --write \"**/*.{ts,js,json,md}\"",
     "test": "echo \"Error: no test specified\" && exit 1"
