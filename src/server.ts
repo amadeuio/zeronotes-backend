@@ -4,6 +4,7 @@ import authRoutes from "./routes/auth.routes";
 import bootstrapRoutes from "./routes/bootstrap.routes";
 import labelsRoutes from "./routes/labels.routes";
 import notesRoutes from "./routes/notes.routes";
+import "./types/express";
 import { env } from "./utils/env";
 
 const app = express();

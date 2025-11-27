@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import { userService } from "../domain/users/user.service";
-import "../types/express";
 import { verifyToken } from "../utils/jwt";
 
 export const authenticate = async (
