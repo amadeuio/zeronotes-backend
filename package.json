@@ -12,7 +12,9 @@
     "format": "prettier --write \"**/*.{ts,js,json,md}\"",
     "check": "tsc --noEmit",
     "test": "cd api-tests && ./demo.sh",
-    "test:auth": "cd api-tests && ./test-auth-success.sh && ./test-auth-failures.sh"
+    "test:auth": "cd api-tests && ./test-auth-success.sh && ./test-auth-failures.sh",
+    "test:zod": "cd api-tests && ./test-zod-validation.sh",
+    "test:all": "npm run test && npm run test:auth && npm run test:zod"
   },
   "repository": {
     "type": "git",
@@ -33,7 +35,8 @@
     "express": "^5.1.0",
     "jose": "^6.1.2",
     "pg": "^8.16.3",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@types/argon2": "^0.14.1",

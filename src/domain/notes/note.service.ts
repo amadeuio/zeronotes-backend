@@ -1,6 +1,7 @@
 import { noteLabelRepository } from "../noteLabels/noteLabels.repository";
 import { noteMappers } from "./note.mappers";
-import { NoteAPI, NoteCreateRequest, NoteUpdateRequest } from "./note.types";
+import { NoteCreateSchema, NoteUpdateSchema } from "./note.schemas";
+import { NoteAPI } from "./note.types";
 import { noteRepository } from "./notes.repository";
 
 export const noteService = {
@@ -25,7 +26,7 @@ export const noteService = {
     return { notesById, notesOrder };
   },
 
-  create: async (userId: string, data: NoteCreateRequest): Promise<string> => {
+  create: async (userId: string, data: NoteCreateSchema): Promise<string> => {
     const minOrder = await noteRepository.getMinOrder(userId);
 
     const note = await noteRepository.create(
@@ -49,7 +50,7 @@ export const noteService = {
   update: async (
     userId: string,
     id: string,
-    data: NoteUpdateRequest
+    data: NoteUpdateSchema
   ): Promise<string> => {
     const note = await noteRepository.update(
       userId,

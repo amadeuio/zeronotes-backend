@@ -1,10 +1,7 @@
-import { labelRepository } from "./labels.repository";
 import { labelMappers } from "./label.mappers";
-import {
-  LabelAPI,
-  LabelCreateRequest,
-  LabelUpdateRequest,
-} from "./label.types";
+import { LabelCreateSchema, LabelUpdateSchema } from "./label.schemas";
+import { LabelAPI } from "./label.types";
+import { labelRepository } from "./labels.repository";
 
 export const labelService = {
   findAll: async (userId: string): Promise<Record<string, LabelAPI>> => {
@@ -19,10 +16,7 @@ export const labelService = {
     return labelsById;
   },
 
-  create: async (
-    userId: string,
-    data: LabelCreateRequest
-  ): Promise<string> => {
+  create: async (userId: string, data: LabelCreateSchema): Promise<string> => {
     const label = await labelRepository.create(userId, data.id, data.name);
     return label.id;
   },
@@ -30,7 +24,7 @@ export const labelService = {
   update: async (
     userId: string,
     id: string,
-    data: LabelUpdateRequest
+    data: LabelUpdateSchema
   ): Promise<string> => {
     const label = await labelRepository.update(userId, id, data.name);
     return label.id;

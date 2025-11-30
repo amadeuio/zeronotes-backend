@@ -1,46 +1,24 @@
 import express, { Request, Response } from "express";
 import { authenticate } from "../../middleware/auth.middleware";
-import {
-  AuthError,
-  NotFoundError,
-  ValidationError,
-} from "../../utils/AppError";
+import { validate } from "../../middleware/validate.middleware";
+import { AuthError, NotFoundError } from "../../utils/AppError";
 import { asyncHandler } from "../../utils/asyncHandler";
+import { loginSchema, userCreateSchema } from "./user.schemas";
 import { userService } from "./user.service";
 
 const router = express.Router();
 
-const register = asyncHandler(
-  async (
-    req: Request<{}, {}, { email: string; password: string }>,
-    res: Response
-  ) => {
-    const { email, password } = req.body;
+const register = asyncHandler(async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const result = await userService.register({ email, password });
+  res.status(201).json(result);
+});
 
-    if (!email || !password) {
-      throw new ValidationError("Email and password are required");
-    }
-
-    const result = await userService.register({ email, password });
-    res.status(201).json(result);
-  }
-);
-
-const login = asyncHandler(
-  async (
-    req: Request<{}, {}, { email: string; password: string }>,
-    res: Response
-  ) => {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      throw new ValidationError("Email and password are required");
-    }
-
-    const result = await userService.login({ email, password });
-    res.json(result);
-  }
-);
+const login = asyncHandler(async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const result = await userService.login({ email, password });
+  res.json(result);
+});
 
 const me = asyncHandler(async (req: Request, res: Response) => {
   const userId = req.userId;
@@ -56,8 +34,8 @@ const me = asyncHandler(async (req: Request, res: Response) => {
   res.json(user);
 });
 
-router.post("/register", register);
-router.post("/login", login);
+router.post("/register", validate(userCreateSchema), register);
+router.post("/login", validate(loginSchema), login);
 router.get("/me", authenticate, me);
 
 export default router;

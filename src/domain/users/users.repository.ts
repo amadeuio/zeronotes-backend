@@ -28,4 +28,3 @@ export const userRepository = {
     return result.rows[0];
   },
 };
-

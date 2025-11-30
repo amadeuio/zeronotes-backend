@@ -9,12 +9,3 @@ export interface LabelAPI {
   id: string;
   name: string;
 }
-
-export interface LabelCreateRequest {
-  id: string;
-  name: string;
-}
-
-export interface LabelUpdateRequest {
-  name: string;
-}

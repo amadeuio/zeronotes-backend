@@ -44,4 +44,3 @@ export const noteLabelRepository = {
     return result.rowCount ? result.rowCount > 0 : false;
   },
 };
-

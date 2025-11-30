@@ -11,19 +11,20 @@ cd api-tests
 
 ## 📋 All Commands
 
-| Script | Description | Example |
-|--------|-------------|---------|
-| `./register.sh` | Register new user | `./register.sh user@test.com pass123` |
-| `./login.sh` | Login existing user | `./login.sh user@test.com pass123` |
-| `./create-note.sh` | Create a note | `./create-note.sh "" "Title" "Content"` |
-| `./get-notes.sh` | List all notes | `./get-notes.sh` |
-| `./update-note.sh` | Update a note | `./update-note.sh <ID> "New Title" "Content"` |
-| `./delete-note.sh` | Delete a note | `./delete-note.sh <ID> -y` |
-| `./demo.sh` | Run complete workflow | `./demo.sh` |
+| Script             | Description           | Example                                       |
+| ------------------ | --------------------- | --------------------------------------------- |
+| `./register.sh`    | Register new user     | `./register.sh user@test.com pass123`         |
+| `./login.sh`       | Login existing user   | `./login.sh user@test.com pass123`            |
+| `./create-note.sh` | Create a note         | `./create-note.sh "" "Title" "Content"`       |
+| `./get-notes.sh`   | List all notes        | `./get-notes.sh`                              |
+| `./update-note.sh` | Update a note         | `./update-note.sh <ID> "New Title" "Content"` |
+| `./delete-note.sh` | Delete a note         | `./delete-note.sh <ID> -y`                    |
+| `./demo.sh`        | Run complete workflow | `./demo.sh`                                   |
 
 ## 🎯 Common Workflows
 
 ### First Time Setup
+
 ```bash
 ./register.sh                                    # Creates account & saves token
 ./create-note.sh "" "My Note" "Content here"    # Creates note
@@ -31,6 +32,7 @@ cd api-tests
 ```
 
 ### Daily Testing
+
 ```bash
 ./login.sh user@test.com password               # Get fresh token
 ./create-note.sh                                # Quick note with defaults
@@ -38,6 +40,7 @@ cd api-tests
 ```
 
 ### Update & Delete
+
 ```bash
 ./get-notes.sh                                  # Get note ID
 ./update-note.sh <ID> "New Title" "New Content" # Update
@@ -74,14 +77,13 @@ export TOKEN_FILE="/tmp/my_token.txt"           # Change token location
 
 ## 🆘 Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| "No token found" | Run `./login.sh` first |
-| "Connection refused" | Start backend: `npm run dev` |
-| "Permission denied" | Run `chmod +x *.sh` |
-| No JSON formatting | Install jq: `brew install jq` |
+| Issue                | Solution                      |
+| -------------------- | ----------------------------- |
+| "No token found"     | Run `./login.sh` first        |
+| "Connection refused" | Start backend: `npm run dev`  |
+| "Permission denied"  | Run `chmod +x *.sh`           |
+| No JSON formatting   | Install jq: `brew install jq` |
 
 ## 📖 Full Documentation
 
 See [README.md](README.md) for complete documentation.
-

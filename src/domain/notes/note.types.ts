@@ -22,22 +22,3 @@ export interface NoteAPI {
   isArchived: boolean;
   isTrashed: boolean;
 }
-
-export interface NoteCreateRequest {
-  id: string;
-  title?: string;
-  content?: string;
-  colorId?: string;
-  isPinned?: boolean;
-  isArchived?: boolean;
-  labelIds?: string[];
-}
-
-export interface NoteUpdateRequest {
-  title?: string;
-  content?: string;
-  colorId?: string;
-  isPinned?: boolean;
-  isArchived?: boolean;
-  isTrashed?: boolean;
-}

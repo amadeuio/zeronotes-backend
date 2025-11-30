@@ -42,4 +42,3 @@ export const labelRepository = {
     return result.rowCount ? result.rowCount > 0 : false;
   },
 };
-

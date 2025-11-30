@@ -1,9 +1,14 @@
 import express, { Request, Response } from "express";
 import { authenticate } from "../../middleware/auth.middleware";
-import { NotFoundError, ValidationError } from "../../utils/AppError";
+import { validate } from "../../middleware/validate.middleware";
+import { NotFoundError } from "../../utils/AppError";
 import { asyncHandler } from "../../utils/asyncHandler";
+import {
+  labelCreateSchema,
+  labelIdParamSchema,
+  labelUpdateSchema,
+} from "./label.schemas";
 import { labelService } from "./label.service";
-import { LabelCreateRequest, LabelUpdateRequest } from "./label.types";
 
 const router = express.Router();
 
@@ -12,57 +17,50 @@ const getAllLabels = asyncHandler(async (req: Request, res: Response) => {
   res.json(labels);
 });
 
-const createLabel = asyncHandler(
-  async (req: Request<{}, {}, LabelCreateRequest>, res: Response) => {
-    const data = req.body;
+const createLabel = asyncHandler(async (req: Request, res: Response) => {
+  const data = req.body;
+  const labelId = await labelService.create(req.userId!, data);
+  res.status(201).json({ id: labelId });
+});
 
-    if (!data.id || !data.name) {
-      throw new ValidationError("id and name are required");
-    }
+const updateLabel = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const data = req.body;
 
-    const labelId = await labelService.create(req.userId!, data);
-    res.status(201).json({ id: labelId });
+  const labelId = await labelService.update(req.userId!, id, data);
+
+  if (!labelId) {
+    throw new NotFoundError("Label");
   }
-);
 
-const updateLabel = asyncHandler(
-  async (
-    req: Request<{ id: string }, {}, LabelUpdateRequest>,
-    res: Response
-  ) => {
-    const { id } = req.params;
-    const data = req.body;
+  res.json({ id: labelId });
+});
 
-    if (!data.name) {
-      throw new ValidationError("Name is required");
-    }
+const deleteLabel = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const deleted = await labelService.delete(req.userId!, id);
 
-    const labelId = await labelService.update(req.userId!, id, data);
-
-    if (!labelId) {
-      throw new NotFoundError("Label");
-    }
-
-    res.json({ id: labelId });
+  if (!deleted) {
+    throw new NotFoundError("Label");
   }
-);
 
-const deleteLabel = asyncHandler(
-  async (req: Request<{ id: string }>, res: Response) => {
-    const { id } = req.params;
-    const deleted = await labelService.delete(req.userId!, id);
-
-    if (!deleted) {
-      throw new NotFoundError("Label");
-    }
-
-    res.status(204).send();
-  }
-);
+  res.status(204).send();
+});
 
 router.get("/", authenticate, getAllLabels);
-router.post("/", authenticate, createLabel);
-router.put("/:id", authenticate, updateLabel);
-router.delete("/:id", authenticate, deleteLabel);
+router.post("/", authenticate, validate(labelCreateSchema), createLabel);
+router.put(
+  "/:id",
+  authenticate,
+  validate(labelIdParamSchema, "params"),
+  validate(labelUpdateSchema),
+  updateLabel
+);
+router.delete(
+  "/:id",
+  authenticate,
+  validate(labelIdParamSchema, "params"),
+  deleteLabel
+);
 
 export default router;
