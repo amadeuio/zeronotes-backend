@@ -31,3 +31,7 @@ build/
 coverage/
 .nyc_output/
 
+# API Test Suite - Token and state files
+api-tests/state/*
+!api-tests/state/.gitkeep
+
