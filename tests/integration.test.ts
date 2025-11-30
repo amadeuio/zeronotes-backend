@@ -14,7 +14,7 @@ describe("Notes and Labels Integration", () => {
   });
 
   describe("Adding and removing labels from notes", () => {
-    it.only("should add a label to a note", async () => {
+    it("should add a label to a note", async () => {
       // Create a note
       const noteResponse = await createNote(token, {
         title: "Test Note",
@@ -136,8 +136,8 @@ describe("Notes and Labels Integration", () => {
 
       const note = getResponse.body.notesById[noteId];
       expect(note).toBeDefined();
-      expect(note.labels).toBeDefined();
-      expect(note.labels.length).toBe(3);
+      expect(note.labelIds).toBeDefined();
+      expect(note.labelIds.length).toBe(3);
     });
 
     it("should handle deleting a label that's assigned to multiple notes", async () => {
