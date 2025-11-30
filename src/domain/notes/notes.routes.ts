@@ -6,7 +6,7 @@ import { asyncHandler } from "../../utils/asyncHandler";
 import { labelCreateSchema } from "../labels/labels.schemas";
 import { labelService } from "../labels/labels.service";
 import {
-  labelIdParamSchema,
+  noteAndLabelIdParamSchema,
   noteCreateSchema,
   noteIdParamSchema,
   noteUpdateSchema,
@@ -73,7 +73,7 @@ const createLabelAndAddToNote = asyncHandler(
     const label = await labelService.create(req.userId!, labelData);
     await noteService.addLabel(id, labelData.id);
 
-    res.status(201).json(label);
+    res.status(201).json({ id: label });
   }
 );
 
@@ -101,15 +101,13 @@ router.delete(
 router.post(
   "/:id/labels/:labelId",
   authenticate,
-  validate(noteIdParamSchema, "params"),
-  validate(labelIdParamSchema, "params"),
+  validate(noteAndLabelIdParamSchema, "params"),
   addLabelToNote
 );
 router.delete(
   "/:id/labels/:labelId",
   authenticate,
-  validate(noteIdParamSchema, "params"),
-  validate(labelIdParamSchema, "params"),
+  validate(noteAndLabelIdParamSchema, "params"),
   removeLabelFromNote
 );
 router.post(

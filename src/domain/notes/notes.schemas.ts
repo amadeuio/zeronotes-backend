@@ -27,6 +27,11 @@ export const labelIdParamSchema = z.object({
   labelId: z.string().uuid("Invalid label UUID format"),
 });
 
+export const noteAndLabelIdParamSchema = z.object({
+  id: z.string().uuid("Invalid note UUID format"),
+  labelId: z.string().uuid("Invalid label UUID format"),
+});
+
 export const reorderNotesSchema = z.object({
   noteIds: z
     .array(z.string().uuid("Invalid note UUID format"))
@@ -37,4 +42,7 @@ export type NoteCreateSchema = z.infer<typeof noteCreateSchema>;
 export type NoteUpdateSchema = z.infer<typeof noteUpdateSchema>;
 export type NoteIdParamSchema = z.infer<typeof noteIdParamSchema>;
 export type LabelIdParamSchema = z.infer<typeof labelIdParamSchema>;
+export type NoteAndLabelIdParamSchema = z.infer<
+  typeof noteAndLabelIdParamSchema
+>;
 export type ReorderNotesSchema = z.infer<typeof reorderNotesSchema>;
