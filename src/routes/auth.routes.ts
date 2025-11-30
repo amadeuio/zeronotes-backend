@@ -1,74 +1,56 @@
 import express, { Request, Response } from "express";
 import { userService } from "../domain/users/user.service";
+import { AuthError, NotFoundError, ValidationError } from "../errors/AppError";
 import { authenticate } from "../middleware/auth.middleware";
+import { asyncHandler } from "../utils/asyncHandler";
 
-const router = express.Router();
+  const router = express.Router();
 
-const register = async (
-  req: Request<{}, {}, { email: string; password: string }>,
-  res: Response
-) => {
-  try {
+const register = asyncHandler(
+  async (
+    req: Request<{}, {}, { email: string; password: string }>,
+    res: Response
+  ) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      res.status(400).json({ error: "Email and password are required" });
-      return;
+      throw new ValidationError("Email and password are required");
     }
 
     const result = await userService.register({ email, password });
     res.status(201).json(result);
-  } catch (error: any) {
-    if (error.message === "User already exists") {
-      res.status(409).json({ error: "User already exists" });
-    } else {
-      res.status(500).json({ error: "Failed to register user" });
-    }
   }
-};
+);
 
-const login = async (
-  req: Request<{}, {}, { email: string; password: string }>,
-  res: Response
-) => {
-  try {
+const login = asyncHandler(
+  async (
+    req: Request<{}, {}, { email: string; password: string }>,
+    res: Response
+  ) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      res.status(400).json({ error: "Email and password are required" });
-      return;
+      throw new ValidationError("Email and password are required");
     }
 
     const result = await userService.login({ email, password });
     res.json(result);
-  } catch (error: any) {
-    if (error.message === "Invalid credentials") {
-      res.status(401).json({ error: "Invalid credentials" });
-    } else {
-      res.status(500).json({ error: "Failed to login" });
-    }
   }
-};
+);
 
-const me = async (req: Request, res: Response) => {
-  try {
-    const userId = req.userId;
-    if (!userId) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
-    }
-
-    const user = await userService.findById(userId);
-    if (!user) {
-      res.status(404).json({ error: "User not found" });
-      return;
-    }
-
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to get user" });
+const me = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.userId;
+  if (!userId) {
+    throw new AuthError();
   }
-};
+
+  const user = await userService.findById(userId);
+  if (!user) {
+    throw new NotFoundError("User");
+  }
+
+  res.json(user);
+});
 
 router.post("/register", register);
 router.post("/login", login);

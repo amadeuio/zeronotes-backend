@@ -1,17 +1,14 @@
 import express, { Request, Response } from "express";
 import { authenticate } from "../middleware/auth.middleware";
 import { bootstrapService } from "../domain/bootstrap/bootstrap.service";
+import { asyncHandler } from "../utils/asyncHandler";
 
 const router = express.Router();
 
-const getBootstrap = async (req: Request, res: Response) => {
-  try {
-    const bootstrap = await bootstrapService.findAll(req.userId!);
-    res.json(bootstrap);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch bootstrap data" });
-  }
-};
+const getBootstrap = asyncHandler(async (req: Request, res: Response) => {
+  const bootstrap = await bootstrapService.findAll(req.userId!);
+  res.json(bootstrap);
+});
 
 router.get("/", authenticate, getBootstrap);
 

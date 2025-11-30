@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import { userQueries } from "../../db/queries/users";
+import { AuthError, ConflictError } from "../../errors/AppError";
 import { hashPassword, verifyPassword } from "../../utils/crypto";
 import { createToken } from "../../utils/jwt";
 import { userMappers } from "./user.mappers";
@@ -14,7 +15,7 @@ export const userService = {
   register: async (data: UserCreateRequest): Promise<AuthResponse> => {
     const existingUser = await userQueries.findByEmail(data.email);
     if (existingUser) {
-      throw new Error("User already exists");
+      throw new ConflictError("User already exists");
     }
 
     const passwordHash = await hashPassword(data.password);
@@ -33,12 +34,12 @@ export const userService = {
   login: async (data: LoginRequest): Promise<AuthResponse> => {
     const user = await userQueries.findByEmail(data.email);
     if (!user) {
-      throw new Error("Invalid credentials");
+      throw new AuthError("Invalid credentials");
     }
 
     const isValid = await verifyPassword(user.password_hash, data.password);
     if (!isValid) {
-      throw new Error("Invalid credentials");
+      throw new AuthError("Invalid credentials");
     }
 
     const token = await createToken(user.id);

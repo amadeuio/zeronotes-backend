@@ -6,6 +6,7 @@ import labelsRoutes from "./routes/labels.routes";
 import notesRoutes from "./routes/notes.routes";
 import "./types/express";
 import { env } from "./utils/env";
+import { errorHandler, notFoundHandler } from "./middleware/error.middleware";
 
 const app = express();
 
@@ -20,6 +21,9 @@ app.use("/api/bootstrap", bootstrapRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/notes", notesRoutes);
 app.use("/api/labels", labelsRoutes);
+
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 const PORT = env.PORT;
 

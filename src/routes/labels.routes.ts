@@ -5,78 +5,63 @@ import {
   LabelCreateRequest,
   LabelUpdateRequest,
 } from "../domain/labels/label.types";
+import { asyncHandler } from "../utils/asyncHandler";
+import { ValidationError, NotFoundError } from "../errors/AppError";
 
 const router = express.Router();
 
-const getAllLabels = async (req: Request, res: Response) => {
-  try {
-    const labels = await labelService.findAll(req.userId!);
-    res.json(labels);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch labels" });
-  }
-};
+const getAllLabels = asyncHandler(async (req: Request, res: Response) => {
+  const labels = await labelService.findAll(req.userId!);
+  res.json(labels);
+});
 
-const createLabel = async (
+const createLabel = asyncHandler(async (
   req: Request<{}, {}, LabelCreateRequest>,
   res: Response
 ) => {
-  try {
-    const data = req.body;
+  const data = req.body;
 
-    if (!data.id || !data.name) {
-      res.status(400).json({ error: "id and name are required" });
-      return;
-    }
-
-    const labelId = await labelService.create(req.userId!, data);
-    res.status(201).json(labelId);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to create label" });
+  if (!data.id || !data.name) {
+    throw new ValidationError("id and name are required");
   }
-};
 
-const updateLabel = async (
+  const labelId = await labelService.create(req.userId!, data);
+  res.status(201).json(labelId);
+});
+
+const updateLabel = asyncHandler(async (
   req: Request<{ id: string }, {}, LabelUpdateRequest>,
   res: Response
 ) => {
-  try {
-    const { id } = req.params;
-    const data = req.body;
+  const { id } = req.params;
+  const data = req.body;
 
-    if (!data.name) {
-      res.status(400).json({ error: "Name is required" });
-      return;
-    }
-
-    const labelId = await labelService.update(req.userId!, id, data);
-
-    if (!labelId) {
-      res.status(404).json({ error: "Label not found" });
-      return;
-    }
-
-    res.json(labelId);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to update label" });
+  if (!data.name) {
+    throw new ValidationError("Name is required");
   }
-};
 
-const deleteLabel = async (req: Request<{ id: string }>, res: Response) => {
-  try {
-    const { id } = req.params;
-    const deleted = await labelService.delete(req.userId!, id);
+  const labelId = await labelService.update(req.userId!, id, data);
 
-    if (!deleted) {
-      res.status(404).json({ error: "Label not found" });
-      return;
-    }
-
-    res.status(204).send();
-  } catch (error) {
-    res.status(500).json({ error: "Failed to delete label" });
+  if (!labelId) {
+    throw new NotFoundError("Label");
   }
-};
+
+  res.json(labelId);
+});
+
+const deleteLabel = asyncHandler(async (
+  req: Request<{ id: string }>,
+  res: Response
+) => {
+  const { id } = req.params;
+  const deleted = await labelService.delete(req.userId!, id);
+
+  if (!deleted) {
+    throw new NotFoundError("Label");
+  }
+
+  res.status(204).send();
+});
 
 router.get("/", authenticate, getAllLabels);
 router.post("/", authenticate, createLabel);

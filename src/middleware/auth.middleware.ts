@@ -1,17 +1,17 @@
 import { NextFunction, Request, Response } from "express";
 import { userService } from "../domain/users/user.service";
 import { verifyToken } from "../utils/jwt";
+import { AuthError } from "../errors/AppError";
 
 export const authenticate = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      res.status(401).json({ error: "No token provided" });
-      return;
+      throw new AuthError("No token provided");
     }
 
     const token = authHeader.substring(7);
@@ -20,13 +20,12 @@ export const authenticate = async (
     const user = await userService.findById(userId);
 
     if (!user) {
-      res.status(401).json({ error: "User not found" });
-      return;
+      throw new AuthError("User not found");
     }
 
     req.userId = userId;
     next();
   } catch (error) {
-    res.status(401).json({ error: "Invalid or expired token" });
+    next(error instanceof AuthError ? error : new AuthError("Invalid or expired token"));
   }
 };
