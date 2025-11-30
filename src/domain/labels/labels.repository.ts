@@ -1,5 +1,5 @@
 import pool from "../../db/client";
-import { LabelDB } from "./label.types";
+import { LabelDB } from "./labels.types";
 
 export const labelRepository = {
   findAll: async (userId: string): Promise<LabelDB[]> => {

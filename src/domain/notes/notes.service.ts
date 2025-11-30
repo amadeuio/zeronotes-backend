@@ -1,7 +1,7 @@
 import { noteLabelRepository } from "../noteLabels/noteLabels.repository";
-import { noteMappers } from "./note.mappers";
-import { NoteCreateSchema, NoteUpdateSchema } from "./note.schemas";
-import { NoteAPI } from "./note.types";
+import { noteMappers } from "./notes.mappers";
+import { NoteCreateSchema, NoteUpdateSchema } from "./notes.schemas";
+import { NoteAPI } from "./notes.types";
 import { noteRepository } from "./notes.repository";
 
 export const noteService = {

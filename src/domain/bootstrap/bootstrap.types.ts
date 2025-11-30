@@ -1,5 +1,5 @@
-import { LabelAPI } from "../labels/label.types";
-import { NoteAPI } from "../notes/note.types";
+import { LabelAPI } from "../labels/labels.types";
+import { NoteAPI } from "../notes/notes.types";
 
 export interface BootstrapAPI {
   notesById: Record<string, NoteAPI>;

@@ -1,4 +1,4 @@
-import { LabelAPI, LabelDB } from "./label.types";
+import { LabelAPI, LabelDB } from "./labels.types";
 
 export const labelMappers = {
   dbToAPI: (db: LabelDB): LabelAPI => ({

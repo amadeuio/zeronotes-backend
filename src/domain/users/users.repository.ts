@@ -1,5 +1,5 @@
 import pool from "../../db/client";
-import { UserDB } from "./user.types";
+import { UserDB } from "./users.types";
 
 export const userRepository = {
   findByEmail: async (email: string): Promise<UserDB | null> => {

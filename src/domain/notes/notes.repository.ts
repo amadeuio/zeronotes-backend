@@ -1,5 +1,5 @@
 import pool from "../../db/client";
-import { NoteDB } from "./note.types";
+import { NoteDB } from "./notes.types";
 
 export const noteRepository = {
   findAllWithLabels: async (

@@ -7,8 +7,8 @@ import {
   labelCreateSchema,
   labelIdParamSchema,
   labelUpdateSchema,
-} from "./label.schemas";
-import { labelService } from "./label.service";
+} from "./labels.schemas";
+import { labelService } from "./labels.service";
 
 const router = express.Router();
 

@@ -1,5 +1,5 @@
-import { labelService } from "../labels/label.service";
-import { noteService } from "../notes/note.service";
+import { labelService } from "../labels/labels.service";
+import { noteService } from "../notes/notes.service";
 import { BootstrapAPI } from "./bootstrap.types";
 
 export const bootstrapService = {

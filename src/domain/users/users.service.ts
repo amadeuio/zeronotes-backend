@@ -2,9 +2,9 @@ import { v4 as uuidv4 } from "uuid";
 import { AuthError, ConflictError } from "../../utils/AppError";
 import { hashPassword, verifyPassword } from "../../utils/crypto";
 import { createToken } from "../../utils/jwt";
-import { userMappers } from "./user.mappers";
-import { LoginSchema, UserCreateSchema } from "./user.schemas";
-import { AuthResponse, UserAPI } from "./user.types";
+import { userMappers } from "./users.mappers";
+import { LoginSchema, UserCreateSchema } from "./users.schemas";
+import { AuthResponse, UserAPI } from "./users.types";
 import { userRepository } from "./users.repository";
 
 export const userService = {

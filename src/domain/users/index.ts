@@ -1,4 +1,4 @@
-export * from "./user.schemas";
-export { userService } from "./user.service";
-export * from "./user.types";
+export * from "./users.schemas";
+export { userService } from "./users.service";
+export * from "./users.types";
 export { default as usersRouter } from "./users.routes";

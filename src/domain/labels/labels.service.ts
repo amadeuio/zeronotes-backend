@@ -1,6 +1,6 @@
-import { labelMappers } from "./label.mappers";
-import { LabelCreateSchema, LabelUpdateSchema } from "./label.schemas";
-import { LabelAPI } from "./label.types";
+import { labelMappers } from "./labels.mappers";
+import { LabelCreateSchema, LabelUpdateSchema } from "./labels.schemas";
+import { LabelAPI } from "./labels.types";
 import { labelRepository } from "./labels.repository";
 
 export const labelService = {

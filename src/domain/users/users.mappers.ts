@@ -1,4 +1,4 @@
-import { UserAPI, UserDB } from "./user.types";
+import { UserAPI, UserDB } from "./users.types";
 
 export const userMappers = {
   dbToAPI: (db: UserDB): UserAPI => ({

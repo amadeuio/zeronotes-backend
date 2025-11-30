@@ -1,4 +1,4 @@
-import { NoteAPI, NoteDB } from "./note.types";
+import { NoteAPI, NoteDB } from "./notes.types";
 
 export const noteMappers = {
   dbToAPI: (db: NoteDB & { label_ids?: string[] }): NoteAPI => ({

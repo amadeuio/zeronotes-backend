@@ -3,8 +3,8 @@ import { authenticate } from "../../middleware/auth.middleware";
 import { validate } from "../../middleware/validate.middleware";
 import { AuthError, NotFoundError } from "../../utils/AppError";
 import { asyncHandler } from "../../utils/asyncHandler";
-import { loginSchema, userCreateSchema } from "./user.schemas";
-import { userService } from "./user.service";
+import { loginSchema, userCreateSchema } from "./users.schemas";
+import { userService } from "./users.service";
 
 const router = express.Router();
 

@@ -3,16 +3,16 @@ import { authenticate } from "../../middleware/auth.middleware";
 import { validate } from "../../middleware/validate.middleware";
 import { NotFoundError } from "../../utils/AppError";
 import { asyncHandler } from "../../utils/asyncHandler";
-import { labelCreateSchema } from "../labels/label.schemas";
-import { labelService } from "../labels/label.service";
+import { labelCreateSchema } from "../labels/labels.schemas";
+import { labelService } from "../labels/labels.service";
 import {
   labelIdParamSchema,
   noteCreateSchema,
   noteIdParamSchema,
   noteUpdateSchema,
   reorderNotesSchema,
-} from "./note.schemas";
-import { noteService } from "./note.service";
+} from "./notes.schemas";
+import { noteService } from "./notes.service";
 
 const router = express.Router();
 
