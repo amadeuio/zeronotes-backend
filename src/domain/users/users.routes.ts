@@ -3,7 +3,7 @@ import { authenticate } from "../../middleware/auth.middleware";
 import { validate } from "../../middleware/validate.middleware";
 import { AuthError, NotFoundError } from "../../utils/AppError";
 import { asyncHandler } from "../../utils/asyncHandler";
-import { loginSchema, userCreateSchema } from "./users.schemas";
+import { loginSchema, registerSchema } from "./users.schemas";
 import { userService } from "./users.service";
 
 const router = express.Router();
@@ -34,8 +34,8 @@ const me = asyncHandler(async (req: Request, res: Response) => {
   res.json(user);
 });
 
-router.post("/register", validate(userCreateSchema), register);
-router.post("/login", validate(loginSchema), login);
+router.post("/register", validate(registerSchema.body), register);
+router.post("/login", validate(loginSchema.body), login);
 router.get("/me", authenticate, me);
 
 export default router;

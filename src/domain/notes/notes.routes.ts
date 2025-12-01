@@ -3,14 +3,16 @@ import { authenticate } from "../../middleware/auth.middleware";
 import { validate } from "../../middleware/validate.middleware";
 import { NotFoundError } from "../../utils/AppError";
 import { asyncHandler } from "../../utils/asyncHandler";
-import { labelCreateSchema } from "../labels/labels.schemas";
+import { createLabelSchema } from "../labels/labels.schemas";
 import { labelService } from "../labels/labels.service";
 import {
-  noteAndLabelIdParamSchema,
-  noteCreateSchema,
-  noteIdParamSchema,
-  noteUpdateSchema,
+  addLabelToNoteSchema,
+  createLabelAndAddToNoteSchema,
+  createNoteSchema,
+  deleteNoteSchema,
+  removeLabelFromNoteSchema,
   reorderNotesSchema,
+  updateNoteSchema,
 } from "./notes.schemas";
 import { noteService } from "./notes.service";
 
@@ -64,7 +66,6 @@ const removeLabelFromNote = asyncHandler(
     res.status(204).send();
   }
 );
-
 const createLabelAndAddToNote = asyncHandler(
   async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -84,43 +85,43 @@ const reorderNotes = asyncHandler(async (req: Request, res: Response) => {
 });
 
 router.get("/", authenticate, getAllNotes);
-router.post("/", authenticate, validate(noteCreateSchema), createNote);
+router.post("/", authenticate, validate(createNoteSchema.body), createNote);
 router.put(
   "/:id",
   authenticate,
-  validate(noteIdParamSchema, "params"),
-  validate(noteUpdateSchema),
+  validate(updateNoteSchema.params, "params"),
+  validate(updateNoteSchema.body),
   updateNote
 );
 router.delete(
   "/:id",
   authenticate,
-  validate(noteIdParamSchema, "params"),
+  validate(deleteNoteSchema.params, "params"),
   deleteNote
 );
 router.post(
   "/:id/labels/:labelId",
   authenticate,
-  validate(noteAndLabelIdParamSchema, "params"),
+  validate(addLabelToNoteSchema.params, "params"),
   addLabelToNote
 );
 router.delete(
   "/:id/labels/:labelId",
   authenticate,
-  validate(noteAndLabelIdParamSchema, "params"),
+  validate(removeLabelFromNoteSchema.params, "params"),
   removeLabelFromNote
 );
 router.post(
   "/:id/labels",
   authenticate,
-  validate(noteIdParamSchema, "params"),
-  validate(labelCreateSchema),
+  validate(createLabelAndAddToNoteSchema.params, "params"),
+  validate(createLabelSchema.body),
   createLabelAndAddToNote
 );
 router.post(
   "/reorder",
   authenticate,
-  validate(reorderNotesSchema),
+  validate(reorderNotesSchema.body),
   reorderNotes
 );
 

@@ -4,9 +4,9 @@ import { validate } from "../../middleware/validate.middleware";
 import { NotFoundError } from "../../utils/AppError";
 import { asyncHandler } from "../../utils/asyncHandler";
 import {
-  labelCreateSchema,
-  labelIdParamSchema,
-  labelUpdateSchema,
+  createLabelSchema,
+  deleteLabelSchema,
+  updateLabelSchema,
 } from "./labels.schemas";
 import { labelService } from "./labels.service";
 
@@ -48,18 +48,18 @@ const deleteLabel = asyncHandler(async (req: Request, res: Response) => {
 });
 
 router.get("/", authenticate, getAllLabels);
-router.post("/", authenticate, validate(labelCreateSchema), createLabel);
+router.post("/", authenticate, validate(createLabelSchema.body), createLabel);
 router.put(
   "/:id",
   authenticate,
-  validate(labelIdParamSchema, "params"),
-  validate(labelUpdateSchema),
+  validate(updateLabelSchema.params, "params"),
+  validate(updateLabelSchema.body),
   updateLabel
 );
 router.delete(
   "/:id",
   authenticate,
-  validate(labelIdParamSchema, "params"),
+  validate(deleteLabelSchema.params, "params"),
   deleteLabel
 );
 

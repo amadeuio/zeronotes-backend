@@ -3,12 +3,12 @@ import { AuthError, ConflictError } from "../../utils/AppError";
 import { hashPassword, verifyPassword } from "../../utils/crypto";
 import { createToken } from "../../utils/jwt";
 import { userMappers } from "./users.mappers";
-import { LoginSchema, UserCreateSchema } from "./users.schemas";
+import { LoginBody, RegisterBody } from "./users.schemas";
 import { AuthResponse, UserAPI } from "./users.types";
 import { userRepository } from "./users.repository";
 
 export const userService = {
-  register: async (data: UserCreateSchema): Promise<AuthResponse> => {
+  register: async (data: RegisterBody): Promise<AuthResponse> => {
     const existingUser = await userRepository.findByEmail(data.email);
     if (existingUser) {
       throw new ConflictError("User already exists");
@@ -27,7 +27,7 @@ export const userService = {
     };
   },
 
-  login: async (data: LoginSchema): Promise<AuthResponse> => {
+  login: async (data: LoginBody): Promise<AuthResponse> => {
     const user = await userRepository.findByEmail(data.email);
     if (!user) {
       throw new AuthError("Invalid credentials");
